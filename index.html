@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
+    <title>Express Sales Training</title>
     <style>
+        :root {
+            --bg-primary: #f5f5f7;
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border-radius: 20px;
+            --transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,35 +21,352 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .container {
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(245, 245, 247, 0.72);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+            padding: 0 max(22px, env(safe-area-inset-left));
+        }
+
+        .nav-content {
+            max-width: 980px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 52px;
+        }
+
+        .nav-logo {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 80px 22px 20px;
             text-align: center;
-            padding: 2rem;
         }
 
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.07;
+            color: var(--text-primary);
         }
 
-        p {
-            font-size: 1.25rem;
-            opacity: 0.9;
+        .hero p {
+            font-size: clamp(16px, 2vw, 21px);
+            color: var(--text-secondary);
+            margin-top: 12px;
+            font-weight: 400;
+            line-height: 1.38;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Tile Grid */
+        .tile-grid {
+            max-width: 980px;
+            margin: 40px auto 80px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tile Card */
+        .tile {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition);
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 320px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .tile:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .tile:active {
+            transform: scale(0.98);
+        }
+
+        /* Tile Colors */
+        .tile--blue {
+            background: linear-gradient(145deg, #007AFF, #0055D4);
+        }
+
+        .tile--purple {
+            background: linear-gradient(145deg, #AF52DE, #8944AB);
+        }
+
+        .tile--green {
+            background: linear-gradient(145deg, #30D158, #1AAD3E);
+        }
+
+        .tile--orange {
+            background: linear-gradient(145deg, #FF9F0A, #E08600);
+        }
+
+        .tile--pink {
+            background: linear-gradient(145deg, #FF375F, #D42A4C);
+        }
+
+        .tile--teal {
+            background: linear-gradient(145deg, #5AC8FA, #32ADE6);
+        }
+
+        .tile--indigo {
+            background: linear-gradient(145deg, #5856D6, #3E3CB2);
+        }
+
+        .tile--red {
+            background: linear-gradient(145deg, #FF3B30, #D43028);
+        }
+
+        /* Tile Content */
+        .tile__icon {
+            position: absolute;
+            top: 28px;
+            left: 28px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .tile__content {
+            padding: 28px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+            padding-top: 60px;
+        }
+
+        .tile__label {
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .tile__title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.17;
+        }
+
+        .tile__description {
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.85;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .tile__arrow {
+            position: absolute;
+            top: 28px;
+            right: 28px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: opacity var(--transition), transform var(--transition);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .tile:hover .tile__arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Footer */
+        footer {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 20px 22px 40px;
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .tile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tile {
+                min-height: 260px;
+            }
+
+            .hero {
+                padding-top: 48px;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #000000;
+                --text-primary: #f5f5f7;
+                --text-secondary: #86868b;
+            }
+
+            nav {
+                background: rgba(0, 0, 0, 0.72);
+                border-bottom-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .tile {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            }
+
+            .tile:hover {
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            }
+
+            footer {
+                border-top-color: rgba(255, 255, 255, 0.1);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hello, World!</h1>
-        <p>Deployed with GitHub Actions</p>
+
+    <nav>
+        <div class="nav-content">
+            <div>
+                <div class="nav-logo">Express Sales Training</div>
+            </div>
+            <span class="nav-subtitle">Projektübersicht</span>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Willkommen.</h1>
+        <p>Wähle ein Modul aus, um es in einem neuen Fenster zu starten.</p>
+    </section>
+
+    <div class="tile-grid">
+
+        <a class="tile tile--blue" href="pages/produktwissen.html" target="_blank" rel="noopener">
+            <div class="tile__icon">📦</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 1</div>
+                <div class="tile__title">Produktwissen</div>
+                <div class="tile__description">Grundlagen und Details zu allen Produkten im Sortiment.</div>
+            </div>
+        </a>
+
+        <a class="tile tile--purple" href="pages/gespraechsfuehrung.html" target="_blank" rel="noopener">
+            <div class="tile__icon">💬</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 2</div>
+                <div class="tile__title">Gesprächsführung</div>
+                <div class="tile__description">Techniken für erfolgreiche Kundengespräche und Beratung.</div>
+            </div>
+        </a>
+
+        <a class="tile tile--green" href="pages/abschlusstechniken.html" target="_blank" rel="noopener">
+            <div class="tile__icon">🎯</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 3</div>
+                <div class="tile__title">Abschlusstechniken</div>
+                <div class="tile__description">Methoden für den erfolgreichen Verkaufsabschluss.</div>
+            </div>
+        </a>
+
+        <a class="tile tile--orange" href="pages/einwandbehandlung.html" target="_blank" rel="noopener">
+            <div class="tile__icon">🛡️</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 4</div>
+                <div class="tile__title">Einwandbehandlung</div>
+                <div class="tile__description">Strategien zum souveränen Umgang mit Kundeneinwänden.</div>
+            </div>
+        </a>
+
+        <a class="tile tile--pink" href="pages/kundenbindung.html" target="_blank" rel="noopener">
+            <div class="tile__icon">❤️</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 5</div>
+                <div class="tile__title">Kundenbindung</div>
+                <div class="tile__description">Nachhaltige Beziehungen aufbauen und pflegen.</div>
+            </div>
+        </a>
+
+        <a class="tile tile--teal" href="pages/digitaler-vertrieb.html" target="_blank" rel="noopener">
+            <div class="tile__icon">💻</div>
+            <div class="tile__arrow">&#8599;</div>
+            <div class="tile__content">
+                <div class="tile__label">Modul 6</div>
+                <div class="tile__title">Digitaler Vertrieb</div>
+                <div class="tile__description">Online-Kanäle effektiv für den Verkauf nutzen.</div>
+            </div>
+        </a>
+
     </div>
+
+    <footer>
+        <p>&copy; 2026 Express Sales Training. Alle Rechte vorbehalten.</p>
+    </footer>
+
 </body>
 </html>
